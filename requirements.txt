@@ -1,4 +1,4 @@
-Flask==3.0.0rc1  # (Release candidate for Flask 3.0)
-gunicorn==21.2.0  # (No test version available)
-instagrapi==1.19.6  # (No test version available)
-Pillow==10.0.0rc2  # (Release candidate for Pillow 10.0)
+Flask==2.3.2
+gunicorn==21.2.0
+instagrapi==1.19.6
+Pillow>=8.1.1
