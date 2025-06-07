@@ -3,13 +3,8 @@ import hashlib
 import logging
 from flask import Flask, request, jsonify
 from instagrapi import Client
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
-
-# Rate limiter: 10 requests/minute per IP
-limiter = Limiter(app, key_func=get_remote_address, default_limits=["10 per minute"])
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("InstagramAPI")
