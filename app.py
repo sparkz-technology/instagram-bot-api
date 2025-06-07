@@ -44,7 +44,6 @@ def get_client(username: str, password: str) -> Client:
     return cl
 
 @app.route("/post-image", methods=["POST"])
-@limiter.limit("5 per minute")
 def post_image():
     try:
         data = request.get_json(force=True)
