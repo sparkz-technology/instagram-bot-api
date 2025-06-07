@@ -6,6 +6,8 @@ from uuid import uuid4
 from flask import Flask, request, jsonify
 from instagrapi import Client
 from flasgger import Swagger, swag_from
+from urllib.parse import urlparse  # <-- Add this import
+
 
 app = Flask(__name__)
 swagger = Swagger(app)
