@@ -50,21 +50,48 @@ def get_client(username: str, password: str) -> Client:
 
 def download_image(image_url: str) -> str:
     try:
-        response = requests.get(image_url, stream=True)
-        if response.status_code != 200:
-            raise Exception("Failed to download image")
+        # Validate URL format
+        if not image_url.startswith(('http://', 'https://')):
+            raise ValueError("Invalid URL scheme - must be http:// or https://")
 
-        ext = image_url.split(".")[-1].split("?")[0]
-        filename = f"{uuid4().hex}.{ext}"
+        # Ensure temp directory exists
+        os.makedirs(TEMP_DIR, exist_ok=True)
+
+        # Download the image
+        response = requests.get(image_url, stream=True, timeout=10)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+
+        # Extract and sanitize file extension
+        parsed_url = urlparse(image_url)
+        base_name = os.path.basename(parsed_url.path)
+        ext = os.path.splitext(base_name)[1][1:]  # Get extension without dot
+        
+        # Validate extension
+        if not ext or len(ext) > 5 or not ext.isalnum():
+            ext = 'jpg'  # Default fallback
+
+        # Generate safe filename
+        filename = f"{uuid4().hex}.{ext.lower()}"
         local_path = os.path.join(TEMP_DIR, filename)
 
-        with open(local_path, "wb") as f:
-            for chunk in response.iter_content(1024):
-                f.write(chunk)
+        # Save the image
+        with open(local_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:  # Filter out keep-alive chunks
+                    f.write(chunk)
+
+        # Verify file was written
+        if not os.path.exists(local_path):
+            raise IOError("Failed to save downloaded image")
 
         return local_path
+
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Network error downloading image: {str(e)}")
+    except IOError as e:
+        raise Exception(f"Filesystem error saving image: {str(e)}")
     except Exception as e:
-        raise Exception(f"Image download failed: {e}")
+        raise Exception(f"Unexpected error downloading image: {str(e)}")
 
 @app.route("/post-image", methods=["POST"])
 @swag_from({
