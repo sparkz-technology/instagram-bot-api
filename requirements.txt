@@ -2,3 +2,6 @@ Flask==2.3.2
 gunicorn==21.2.0
 instagrapi==1.19.6
 Pillow>=8.1.1
+Flask-Limiter==3.3.0
+requests>=2.31.0
+python-dotenv>=1.0.0  # Optional but recommended for environment variables
